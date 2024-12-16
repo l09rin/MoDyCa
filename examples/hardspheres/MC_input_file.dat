@@ -1,0 +1,81 @@
+DIMENSION 3				# 2, 3 (default)
+PARTICLE_CLASS particle_3D		# options : particle_3D (default) , particle_2D , patchy_2D <number_of_patches> ;
+	       		 		#   according to the potential you want to use and to the space dimension .
+
+# ENSEMBLE MC_NVT 400			#    MC_SWAP_CHARGE <MC_step_length> (constant temperature, only moves consisting of jumps of charge are allowed) .
+# ENSEMBLE NVE 				#    MC_NVT <MC_step_length> (constant temperature, translational (and if the case rotational) moves) .
+ENSEMBLE MC_NVT_CMfixed 500		#    MC_NPT <MC_step_length> (constant temperature, translational (and if the case rotational) moves) .
+					#       NVE is the default option
+					#    MC_NVT_CMfixed <MC_step_length> (constant temperature, translational (and if the case rotational) moves, constrained CM) .
+
+MC_PARAMETER translational_probability 0.5
+MC_PARAMETER max_translation 0.2 AUTO_ADJUST 0.1 0.4  ## THIS should be chosen wisely, not greater than the skin of the verlet cells (also the max for AUTO_ADJUST).
+# MC_PARAMETER max_rotation 1.256 AUTO_ADJUST 0.1 1.256    ##   set { AUTO_ADJUST <min> <max> } to automatically find the optimal values (between min and max) during equilibration.
+# MC_PARAMETER max_boxside_change 0.117 AUTO_ADJUST 0.01 0.117
+	      # MC_PARAMETER [translational_probability|max_translation|max_rotation|max_boxside_change] <value>
+	      # MC_PARAMETER [translational_probability|max_translation|max_rotation|max_boxside_change] <value>
+
+SIGMA 1								# length unit (not in use now)
+EPSILON 1							# energy unit (not in use now)
+PARTICLE_MASS 1							# Particle mass -- eventually overrides every information contained in the initial configuration file
+SIDE 7.76	      						# In units of SIGMA
+     # SIDES 12. 12. 10.    						# In units of SIGMA
+KbT 1.0								# in units of EPSILON, fixed in NVT and NPT ensembles
+PRESSURE 3.0							# in units of EPSILON/SIGMA^3, fixed in NPT ensemble
+
+     # INITIAL_CONFIGURATION file <xyz|nico_bonds|nico_bonds_pbc> <file_name> <energy_per_particle(EPSILON)>
+     # INITIAL_CONFIGURATION file <nico_rings|nico_rings_pbc> <conf_file_name> <polydispersity_file_name> <energy_per_particle(EPSILON)>
+     # INITIAL_CONFIGURATION (random,fcc,bcc,hardspheres) <number_of_particles> <energy_per_particle(EPSILON)> { <HS_radius(SIGMA)> }
+     # INITIAL_CONFIGURATION lattice <number_of_particles> square|hcp2D
+# INITIAL_CONFIGURATION random 400 2.0
+# INITIAL_CONFIGURATION hardspheres 500 2.0 0.500001
+INITIAL_CONFIGURATION fcc 500 2.0 0.500001
+
+     # LENNARD_JONES <cutoff(SIGMA)> <shift(EPSILON)|auto> <verlet_ray_delta(SIGMA)>
+     # WCA_ALPHA <wca_cutoff(SIGMA)> <solvophobic_parameter_alpha> <verlet_ray_delta(SIGMA)>
+     # KERN_FRENKEL <core_radius(SIGMA)> <patch_radial_thickness(SIGMA)> <deltatheta_patch(RAD)> <bond_energy(EPSILON)> <verlet_radius(SIGMA)>
+     # HARD_SPHERE <core_radius(SIGMA)> <verlet_radius(SIGMA)>
+     # HS_SQUARE_WELL <hard_core_radius(SIGMA)> <square_well_radius(SIGMA)> <square_well_energy(EPSILON)> <verlet_radius(SIGMA)>
+     # HARMONIC_SPRING_FIELD <spring_constant(EPSILON/SIGMA^2)>       ## freezes the initial positions as the equilibrium ones
+     # HARMONIC_SPRING_FIELD_WIGNERSEITZ <spring_constant(EPSILON/SIGMA^2)> <neigh_cutoff(SIGMA)> { vacancies <file_xyz> }        ## freezes the initial positions as the equilibrium ones, checks permanence in Wigner-Seitz cell of particles, and no-go Wigner-Seitz cells of vacancies
+HARD_SPHERE 0.5 1.7
+HARMONIC_SPRING_FIELD 100000        ## freezes the initial positions as the equilibrium ones
+# WCA_ALPHA 1.122462048309373 0.0 1.7
+     # FENE <force_constant_kF(EPSILON/SIGMA^2)> <max_extension_R0(SIGMA)>
+     # CHARGES {all|all_noXl|file} {<random> <fraction_of_charges>} {<surface|gauss> <fraction_of_charges> <sigma_of_distrib_as_fraction_of_max_microgel_extent>} {<radial> <fraction_of_charges> <exponent_of_radial_distrition(r^(alpha))>}
+     # DEBYE_HUCKEL <bjerrum_length(SIGMA)> <debye_length(SIGMA)> <cutoff(NUMBER_OF_DEBYE_LENGTHS)> <shift(EPSILON)|auto> <verlet_ray_delta(SIGMA)>
+
+# INTEGRATION_TIME_STEP 0.002	  				# time interval used to numerically integrate equations of motion,
+		      						#    in units of SIGMA*sqrt(PARTICLE_MASS/EPSILON)
+EQUILIBRATION_STEPS 1000					# number of integration steps in the equilibration stage between
+		    						#    successive calculations of msd
+PRODUCTION_STEPS 50000						# number of integration steps in production stage
+SAVING_INTERVALS 1 1 500					# number of integration steps between savings of:
+		     						#    ( global_quantities configuration backup_positions&velocities )
+								#    for the backup configuration set to 0 if you don't want backups
+RUNTIME_CALCULATIONS 0 0 100					# this allows the calculation of radial density profile, gyration radius
+		      						#    and charge distribution during the production run.
+		      						#    First and second options enable/disable (1/0) them
+		      						#          during the equilibration and production stage .
+								#    The third option specifies the steps-interval between two savings
+
+# The sign is equal to 1 if you want to save. The first number refers to the equilibration run, the second one to the production run.
+     # SAVE_ATTRIBUTE <particles|part_img|forces_splitted|velocities|mols_com|mols_com_img|mols_forces_splitted|mols_velocities|energy|virial> 1 1
+     # SAVE_FORMAT xyz|lmp|sph|ptc  # to chose the output format for the configurations dump
+ SAVE_FORMAT xyz
+ SAVE_ATTRIBUTE particles 1 1
+ SAVE_ATTRIBUTE part_img 1 1
+ SAVE_ATTRIBUTE energy 1 1
+ SAVE_POTENTIAL_ENERGY 1 1
+ SAVE_PARTIAL_POTENTIAL_ENERGIES 1 1
+# SAVE_KINETIC_ENERGY 0 0
+# SAVE_SECONDARY_POTENTIAL 0 0
+# SAVE_TEMPERATURE 0 0
+# SAVE_VOLUME 1 1
+     # SAVE_MSD 0 1 <format:all|mols_cm> {<steps_file_name>}	# all = for all particles , mols_cm = for centers of mass of all molecules
+ SAVE_MSD 1 1 all
+# SAVE_VIRIAL_PRESSURE 0 1
+
+# INITIAL_VELOCITIES_BY_FILE 0 velocities.dat				# if = 1 it loads the velocities by this specified file
+
+SAVING_DIRECTORY_NAME results

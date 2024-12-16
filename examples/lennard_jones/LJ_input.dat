@@ -1,0 +1,53 @@
+DIMENSION 3				# 2, 3 (default)
+PARTICLE_CLASS particle_3D		# options : particle_3D (default) , particle_2D , patchy_2D <number_of_patches> ;
+	       		 		#   according to the potential you want to use and to the space dimension .
+ENSEMBLE LANGEVIN 100.			# select the MD ensemble of simulation among NVE (constant energy),
+	 				#    NVT_NHE (constant temperature, Nosè-Hoover equation thermostat),
+	 				#    NVT_NHC (constant temperature, Nosè-Hoover chains thermostat) ,
+					#    BROWNIAN (constant temperature, Smoluchovski equation) . NVE is the default option
+					#    BROWNIAN <friction> (constant temperature, Smoluchovski equation) .
+					#    LANGEVIN <friction> (constant temperature, Langevin (Fokker-Planck equivalent) equation) ,
+	 				#    MC_SWAP_CHARGE <MC_step_length> (constant temperature, only moves consisting of jumps of charge are allowed) . NVE is the default option
+DIMENSION 3				# 2, 3 (default)
+CM_RESET_INTERVAL 1000			# used during the NH equation integration (NVT). number of steps between successive
+		  			#    reset of velocity and position of the center of mass
+SIGMA 1								# length unit (not in use now)
+EPSILON 1							# energy unit (not in use now)
+PARTICLE_MASS 1							# Particle mass
+SIDE 20.	      						# In unity of SIGMA
+     # SIDES 10. 10. 10.    						# In unity of SIGMA
+KbT 3.0								# in unity of EPSILON, fixed in NVT ensemble
+     # INITIAL_CONFIGURATION file <xyz|nico_bonds|nico_bonds_pbc> <file_name> <energy_per_particle(EPSILON)>
+     # INITIAL_CONFIGURATION file <nico_rings|nico_rings_pbc> <conf_file_name> <polydispersity_file_name> <energy_per_particle(EPSILON)>
+     # INITIAL_CONFIGURATION (random,fcc,bcc) <number_of_particles> <energy_per_particle(EPSILON)>
+INITIAL_CONFIGURATION random 2400 3.673
+     # LENNARD_JONES <cutoff(SIGMA)> <shift(EPSILON)|auto> <verlet_ray_delta(SIGMA)>
+LENNARD_JONES 4.0 auto 0.3
+INTEGRATION_TIME_STEP 0.003	  				# time interval used to numerically integrate equations of motion,
+		      						#    in unity of SIGMA*sqrt(PARTICLE_MASS/EPSILON)
+EQUILIBRATION_STEPS 20000					# number of integration steps in the equilibration stage between
+		    						#    successive calculations of msd
+PRODUCTION_STEPS 200000						# number of integration steps in production stage
+SAVING_INTERVALS 1 20000 200000					# number of integration steps between savings of:
+		     						#    ( global_quantities configuration backup_positions&velocities )
+								#    for the backup configuration set to 0 if you don't want backups
+RUNTIME_CALCULATIONS 0 0 1000					# this allows the calculation of radial density profile, gyration radius
+		      						#    and charge distribution during the production run.
+		      						#    First and second options enable/disable (1/0) them
+		      						#          during the equilibration and production stage .
+								#    The third option specifies the steps-interval between two savings
+# The sign is equal to 1 if you want to save. The first number refers to the equilibration run, the second one to the production run.
+     # SAVE_ATTRIBUTE <particles|part_img|forces_splitted|velocities|mols_com|mols_com_img|mols_forces_splitted|mols_velocities|energy|virial> 1 1
+ SAVE_ATTRIBUTE particles 0 1
+ SAVE_POTENTIAL_ENERGY 1 1
+ SAVE_PARTIAL_POTENTIAL_ENERGIES 1 1
+ SAVE_KINETIC_ENERGY 0 0
+ SAVE_SECONDARY_POTENTIAL 0 0
+ SAVE_TEMPERATURE 1 0
+ SAVE_VOLUME 0 0
+     # SAVE_MSD 0 1 <format:all|mols_cm> {<steps_file_name>}	# all = for all particles , mols_cm = for centers of mass of all molecules
+ SAVE_MSD 0 1 all
+ SAVE_GYR 0 0
+ SAVE_VIRIAL_PRESSURE 1 1
+INITIAL_VELOCITIES_BY_FILE 0 velocities.dat				# if = 1 it loads the velocities by this specified file
+SAVING_DIRECTORY_NAME LJresults

@@ -1,0 +1,4 @@
+				# This version of the thermostat consists of a global chain and in the integration the NHC evolution operator is factorized according to the 3rd order Yoshida scheme
+TAU 30.0L			# oscillator's characteristic time (default value = 20)
+THERMOSTATS_PER_CHAIN 7		# number of thermostats in the chain (default value = 7)
+NUMBER_RESPA_STEPS 12 		# number of Respa steps for the integration of factorized NHC evolution operator (default value = 10)
