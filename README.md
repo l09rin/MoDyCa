@@ -97,22 +97,41 @@ Comments start with `#`.
    - `fcc|bcc`  :  for 3D face-centered or body-centered cubic lattices
    - `random`  :  for disordered configurations (energy is calculated according to a truncated and shifted Lennard-Jones)
 
+- **`CHARGES  all|all_noXl|file [random <fraction_of_charges>] [surface|gauss <fraction_of_charges> <sigma_of_distrib_as_fraction_of_max_mol_radial_extent>]`**  :  to setup various charge distributions, to use before enabling Debye-Huckel interactions.
+
 - **`INITIAL_VELOCITIES_BY_FILE <flag> <file>`** : If `flag=1`, load velocities from `file`.
 
 ### Interaction Potentials
 Several models are supported (parameters vary):
-- **`LENNARD_JONES`**
-- **`WCA_ALPHA`**
-- **`KERN_FRENKEL`**
-- **`HARD_SPHERE`**
-- **`HS_SQUARE_WELL`**
-- **`HARMONIC_SPRING_FIELD`**
-- **`HARMONIC_SPRING_FIELD_WIGNERSEITZ`**
-- **`ANGULAR_HARMONIC_SPRING_FIELD`**
-- **`ANGULAR_COSINE_SPRING_FIELD`**
-- **`FENE`** (finite extensible nonlinear elastic bonds)
-- **`CHARGES`** (various charge distributions)
-- **`DEBYE_HUCKEL`** (screened Coulomb)
+- **`LENNARD_JONES <cutoff> <shift|auto> <verlet_rad_delta>`**  :  defines Lennard–Jones potential
+  - `cutoff` : cutoff distance in `SIGMA` units
+  - `shift` : energy shift in `EPSILON` units (or `auto` for automatic)
+  - `verlet_rad_delta` : Verlet list skin in `SIGMA` units
+- **`WCA_ALPHA <cutoff> <solvophobic_parameter> <verlet_rad_delta>`**  :  defines repulsive WCA + solvophobic attractive potential
+  - `solvophobic_parameter` : solvophobic parameter α as in the interaction model used in _Soft matter 15 (40), 8113-8128 (2019)_
+- **`KERN_FRENKEL  <core_radius> <patch_radial_thickness> <deltatheta_patch> <bond_energy> <verlet_radius>`**  :  defines Kern-Frenkel model of patchy particle potential (only in 2D)
+  - `core_radius` : hard core radius in `SIGMA` units
+  - `patch_radial_thickness` : radial extent of the attractive patch from the hard core surface in `SIGMA` units
+  - `deltatheta_patch` : angular half-opening of the attractive patch in radians units
+  - `bond_energy` : patch-patch binding energy in `EPSILON` units
+  - `verlet_radius` : cutoff radius of the Verlet list in `SIGMA` units
+- **`HARD_SPHERE  <core_radius> <verlet_radius>`**  :  defines excluded volume hard sphere interactions
+- **`HS_SQUARE_WELL <core_radius> <square_well_radius> <square_well_energy> <verlet_radius>`**
+  - `square_well_radius` : radial extent of the attractive/repulsive well in `SIGMA` units
+  - `square_well_energy` : square-well attractive/repulsive energy in `EPSILON` units
+- **`HARMONIC_SPRING_FIELD <spring_constant>`**  :  defines harmonic spring attractions towards initial lattice sites.
+  - `spring_constant` : spring elastic constant in `EPSILON/SIGMA^2` units
+- **`HARMONIC_SPRING_FIELD_WIGNERSEITZ <spring_constant> <neigh_cutoff>`**  :  defines harmonic spring attractions towards initial lattice sites, with further constraint to preserve local connectivity.
+  - `neigh_cutoff` : cutoff used to build connectivity network and respective Wigner-Seitz-like cells, in `<debye_length>` units
+- **`ANGULAR_HARMONIC_SPRING_FIELD <spring_constant> <prefactor> <npatches>`**  :  defines harmonic angular spring attractions towards initial orientations (only in 2D)
+  - `spring_constant` : interaction pre-factor in `EPSILON/SIGMA^2` units
+  - `prefactor` : global prefactor, used in thermodynamic integration calculations
+  - `npatches` : rotational symmetry factor of the particle
+- **`FENE <force_constant> <max_extension>`**  :  Finitely Extensible Non-linear Elastic bonds
+  - `force_constant` : interaction pre-factor in `EPSILON/SIGMA^2` units
+  - `max_extension` : maximum bond extension in `SIGMA` units
+- **`DEBYE_HUCKEL <bjerrum_length> <debye_length> <cutoff> <shift|auto> <verlet_rad_delta>`**  :  defines a screened Coulomb interaction
+  - `cutoff` : cutoff distance specified in `<debye_length>` units
 
 ### MD Integration & Simulation Control
 - **`INTEGRATION_TIME_STEP <float>`** : Time step (in `SIGMA * sqrt(MASS/EPSILON)`).
@@ -146,7 +165,7 @@ Several models are supported (parameters vary):
 
 ## Output
 The simulation produces:
-- **Trajectory files** (particle positions and velocities).
+- **Trajectory files** (particle positions, velocities, etc.).
 - **Thermodynamic logs** (energy, temperature, pressure, etc.).
 - **Configuration backups**  (bond network, if present, and position and velocities with machine precision).
 - **Runtime analysis outputs** (if enabled).
