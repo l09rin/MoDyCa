@@ -1,6 +1,6 @@
 # MoDyCa
 **Mo**lecular **Dy**namics and Monte **Ca**rlo algorithms for numerical simulations of Soft Matter systems.
-This code has been used to produce part of the simulation data published on _Soft matter 15 (40), 8113-8128_ and _J. Chem. Phys. 160, 224109 (2024)_.
+This code has been used to produce part of the simulation data published on _Soft matter 15 (40), 8113-8128 (2019)_ and _J. Chem. Phys. 160, 224109 (2024)_.
 
 Two additional utilities are included:
 - `histogram.exe` : to compute distributions from simulation outputs.
