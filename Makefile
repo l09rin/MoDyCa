@@ -26,39 +26,44 @@ OBJ = $(SRC_MAIN:.cpp=.o)
 _EXE = $(subst src/,,$(SRC_MAIN))
 EXE = $(_EXE:.cpp=.exe)
 
-all : $(EXE)
+all : $(EXE)  ## Build all objects and main executables
 	@echo "Built all the targets:"
 	@echo $(EXE)
 
-$(OBJ_MYLIBS): %.o: %.cpp ${DEPS_MYLIBS}
+$(OBJ_MYLIBS): %.o: %.cpp ${DEPS_MYLIBS}  # Compile library object files
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-calculate_GofR.o : src/calculate_GofR.cpp $(SRC_MDMC) $(SRC_MYLIBS) $(DEPS_MYLIBS)
+calculate_GofR.o : src/calculate_GofR.cpp $(SRC_MDMC) $(SRC_MYLIBS) $(DEPS_MYLIBS)  # Compile pair distribution function code object
 	$(CXX) $(CXXFLAGS) -c src/$(@:.o=.cpp) -o $@
 
-histogram.o : src/histogram.cpp $(SRC_MYLIBS) $(DEPS_MYLIBS)
+histogram.o : src/histogram.cpp $(SRC_MYLIBS) $(DEPS_MYLIBS)  # Compile histogram code object
 	$(CXX) $(CXXFLAGS) -c src/$(@:.o=.cpp) -o $@
 
-mcmd.o : src/mcmd.cpp $(SRC_MDMC) $(SRC_MYLIBS) $(DEPS_MYLIBS)
+mcmd.o : src/mcmd.cpp $(SRC_MDMC) $(SRC_MYLIBS) $(DEPS_MYLIBS)  # Compile mcmd object
 	$(CXX) $(CXXFLAGS) -c src/$(@:.o=.cpp) -o $@
 
 
 
-calculate_GofR.exe : src/calculate_GofR.o $(OBJ_MYLIBS)
+calculate_GofR.exe : src/calculate_GofR.o $(OBJ_MYLIBS)  ## Link final executable of the utility to calculate pair distribution functions
 	$(CXX) $(CXXFLAGS) src/$(@:.exe=.o) $(OBJ_MYLIBS) $(MATHLIB) $(THREADLIB) -o $@
 
-histogram.exe : src/histogram.o $(OBJ_MYLIBS)
+histogram.exe : src/histogram.o $(OBJ_MYLIBS)  ## Link final executable of the utility to generate histograms
 	$(CXX) $(CXXFLAGS) src/$(@:.exe=.o) $(OBJ_MYLIBS) $(MATHLIB) -o $@
 
-mcmd.exe : src/mcmd.o $(OBJ_MYLIBS)
+mcmd.exe : src/mcmd.o $(OBJ_MYLIBS)  ## Link final executable of the Molecular Dynamics and MonteCarlo code
 	$(CXX) $(CXXFLAGS) src/$(@:.exe=.o) $(OBJ_MYLIBS) $(MATHLIB) -o $@
 
 
-clean-obj :
+clean-obj :  # Remove all object files
 	rm $(OBJ) $(OBJ_MYLIBS)
 
-clean :
+clean :  ## Remove objects and executables
 	rm $(EXE) $(OBJ) $(OBJ_MYLIBS)
 
-.PHONY : all clean clean-obj
+help:  ## Show this help
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z._-]+ *:.*?##' $(MAKEFILE_LIST) | \
+	    awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+.PHONY : all clean clean-obj help
